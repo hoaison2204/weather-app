@@ -2,12 +2,21 @@ import './App.scss';
 import CurrentWeather from './components/current-weather/CurrentWeather';
 import Search from './components/search/Search';
 import { WEATHER_API_KEY, WEATHER_API_URL } from './Api'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Forecast from './components/forecast/Forecast';
 
 function App() {
+
   const [currentWeather, setCurrentWeather] = useState(null);
   const [forecast, setForecast] = useState(null);
+
+  useEffect(() => {
+    const currentWeatherFetch = fetch(`${WEATHER_API_URL}/weather?lat=21.0245&lon=105.84117&appid=${WEATHER_API_KEY}&units=metric`)
+    Promise.all([currentWeatherFetch]).then(async (response) => {
+      const weatherResponse = await response[0].json()
+      setCurrentWeather({ city: 'Hanoi', ...weatherResponse });
+    })
+  }, []);
 
   const handleOnSearchChange = (searchData) => {
     const [lat, lon] = searchData.value.split(' ');
@@ -32,7 +41,6 @@ function App() {
       />
       {currentWeather && <CurrentWeather data={currentWeather} />}
       {forecast && <Forecast data={forecast} />}
-      {/* <Forecast /> */}
     </div>
   );
 }
